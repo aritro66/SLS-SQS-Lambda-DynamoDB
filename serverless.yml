@@ -1,0 +1,60 @@
+service: demo
+frameworkVersion: '3'
+
+custom: 
+  settings:
+    ACCOUNT_ID: "581086713195"
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  environment: ${self:custom.settings}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "sqs:*"
+      Resource: "arn:aws:sqs:${self:provider.region}:*:demo"
+    - Effect: "Allow"
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+      Resource: "*"
+
+constructs:
+  jobs:
+    type: queue
+    worker:
+      handler: handler.consumer
+
+
+functions:
+  producer:
+    handler: Produce.producer
+    events:
+      - httpApi:
+          method: get
+          path: /produce
+    environment:
+      QUEUE_URL: ${construct:jobs.queueUrl}
+  consume:
+    handler: Consume.consumer
+    events:
+      - sqs:
+          arn: 
+            Fn::GetAtt:
+              - demo
+              - Arn
+          batchSize: 10
+
+plugins:
+  - serverless-lift
+
+resources: 
+  Resources: 
+    demo:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "demo"
