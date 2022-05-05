@@ -57,4 +57,12 @@ resources:
     demo:
       Type: "AWS::SQS::Queue"
       Properties:
+        RedrivePolicy:
+          deadLetterTargetArn: arn:aws:sqs:us-east-1:581086713195:demodlq
+          maxReceiveCount: 3
         QueueName: "demo"
+    
+    demodlq:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "demodlq"
