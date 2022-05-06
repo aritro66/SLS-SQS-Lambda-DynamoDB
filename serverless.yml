@@ -52,6 +52,7 @@ functions:
 
 plugins:
   - serverless-lift
+  - serverless-offline
 
 resources: 
   Resources: 
