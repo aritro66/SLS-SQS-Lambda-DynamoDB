@@ -18,10 +18,7 @@ provider:
       Resource: "arn:aws:sqs:${self:provider.region}:*:demo"
     - Effect: "Allow"
       Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
+        - dynamodb:*
       Resource: "arn:aws:dynamodb:us-east-1:581086713195:table/demo-dlqlist-dev"
 
 constructs:
