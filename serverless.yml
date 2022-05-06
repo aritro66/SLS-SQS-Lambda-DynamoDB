@@ -22,7 +22,7 @@ provider:
         - dynamodb:Scan
         - dynamodb:GetItem
         - dynamodb:PutItem
-      Resource: "*"
+      Resource: "arn:aws:dynamodb:us-east-1:581086713195:table/demo-dlqlist-dev"
 
 constructs:
   jobs:
