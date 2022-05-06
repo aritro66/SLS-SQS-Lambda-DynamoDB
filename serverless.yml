@@ -48,12 +48,7 @@ functions:
           batchSize: 10
   saveDLQ:
     handler: DlqList.savedata
-    events:
-      - sqs:
-          arn:
-            Fn::GetAtt:
-              - dlqlist
-              - Arn
+    
 
 plugins:
   - serverless-lift
