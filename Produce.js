@@ -7,7 +7,7 @@ module.exports.producer = async (event) => {
   let statusCode = 200;
   let message;
 
-  
+
 
   try {
     for (let i = 0; i < 5; i++) {

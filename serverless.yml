@@ -49,10 +49,10 @@ functions:
               - demo
               - Arn
           batchSize: 10
-  savedata:
+  saveDLQ:
     handler: DlqList.savedata
     events:
-      - sqs: 
+      - sqs:
           arn:
             Fn::GetAtt:
               - dlqlist
