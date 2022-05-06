@@ -4,6 +4,7 @@ frameworkVersion: '3'
 custom: 
   settings:
     ACCOUNT_ID: "581086713195"
+    DYNAMODB_DLQ_TABLE: ${self:service}-dlqlist-${sls:stage}
 
 provider:
   name: aws
@@ -48,6 +49,14 @@ functions:
               - demo
               - Arn
           batchSize: 10
+  savedata:
+    handler: DlqList.savedata
+    events:
+      - sqs: 
+          arn:
+            Fn::GetAtt:
+              - dlqlist
+              - Arn
 
 plugins:
   - serverless-lift
@@ -70,6 +79,7 @@ resources:
     dlqlist: 
       Type: AWS::DynamoDB::Table
       Properties:
+        TableName: ${self:service}-dlqlist-${sls:stage}
         AttributeDefinitions:
           - AttributeName: "id"
             AttributeType: "S"
@@ -77,4 +87,3 @@ resources:
         KeySchema:
           - AttributeName: "id"
             KeyType: "HASH"
-        TableName: ${self:service}-dlqlist-${sls:stage}
