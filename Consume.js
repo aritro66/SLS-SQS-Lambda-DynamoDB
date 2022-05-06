@@ -24,21 +24,29 @@ module.exports.consumer = async (event) => {
   } catch (err) {
     console.log("error occured");
     console.log(JSON.stringify(event));
-    const retries = event.Records[0].attributes.ApproximateReceiveCount;
-    const receipt = event.Records[0].receiptHandle;
-    console.log(retries);
-    if (retries <= 3) {
-      console.log("visible");
-      var Visibilityparams = {
-        QueueUrl: QUEUE_URL,
-        ReceiptHandle: receipt,
-        VisibilityTimeout: parseInt(Backoff(retries))
-      };
-      sqs.changeMessageVisibility(Visibilityparams, function (err, data) {
-        if (err) console.log(err, err.stack); 
-        else console.log(data);           
-      });
-    }
+    event.Records.forEach(ele => {
+      const retries = ele.attributes.ApproximateReceiveCount;
+      const receipt = ele.receiptHandle;
+      console.log(retries);
+      if (retries <= 3) {
+        var Visibilityparams = {
+          QueueUrl: QUEUE_URL,
+          ReceiptHandle: receipt,
+          VisibilityTimeout: parseInt(Backoff(retries))
+        };
+        sqs.changeMessageVisibility(Visibilityparams, function (err, data) {
+          console.log("visible");
+          if (err) {
+            console.log(err, err.stack);
+          }
+          else {
+            console.log(data);
+            console.log("v");
+          }
+        });
+      }
+    });
+
 
   };
 
