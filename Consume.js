@@ -3,7 +3,7 @@ const { SQS } = require("aws-sdk");
 const sqs = new SQS();
 const QUEUE_URL = `https://sqs.us-east-1.amazonaws.com/${process.env.ACCOUNT_ID}/demo`;
 
-
+var deadmessage=0;
 var messageCount = 0;
 module.exports.consumer =  (event) => {
 
@@ -29,6 +29,7 @@ module.exports.consumer =  (event) => {
       const receipt = ele.receiptHandle;
       console.log(retries);
       if (retries > 3) {
+        deadmessage+=1;
         return;
       }
       console.log("w");
@@ -41,7 +42,7 @@ module.exports.consumer =  (event) => {
         const chkdata = await sqs.changeMessageVisibility(Visibilityparams).promise();
         console.log(`checking data : ${chkdata}`);
     });
-
+    console.log("dead-message",deadmessage);
 
   };
 

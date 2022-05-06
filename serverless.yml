@@ -48,6 +48,13 @@ functions:
           batchSize: 10
   saveDLQ:
     handler: DlqList.savedata
+    events:
+      - sqs:
+          arn: 
+            Fn::GetAtt:
+              - demodlq
+              - Arn
+          batchSize: 10
     
 
 plugins:
