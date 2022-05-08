@@ -12,29 +12,34 @@ module.exports.consumer = async (event) => {
 
   if (event.Records) {
     messageCount += event.Records.length
-  }
-  
-  if (retries > 3) {
+  }  
+  console.log('Message Count: ', messageCount)
+  console.log(JSON.stringify(event))
+  if (event.Records[0].attributes.ApproximateReceiveCount > 3) {
     throw new Error("more than 3 tries");
   }
   if (random > 0.5) {
-    const retries = event.Records[0].attributes.ApproximateReceiveCount;
-    const receipt = event.Records[0].receiptHandle;
-    const Visibilityparams = {
-      QueueUrl: QUEUE_URL,
-      ReceiptHandle: receipt,
-      VisibilityTimeout: parseInt(Backoff(retries))
-    };
-    console.log(Visibilityparams)
-    sqs.changeMessageVisibility(Visibilityparams)
+    event.Records.forEach((ele) => {
+      const retries = ele.attributes.ApproximateReceiveCount;
+      const receipt = ele.receiptHandle;
+      console.log(retries);
+      
+      console.log("w");
+      const Visibilityparams = {
+          QueueUrl: QUEUE_URL,
+          ReceiptHandle: receipt,
+          VisibilityTimeout: parseInt(Backoff(retries))
+        };
+        console.log(Visibilityparams)
+        sqs.changeMessageVisibility(Visibilityparams)
+    });
 
 
-    throw new Error(`Im an error! ${retries}`)
+    throw new Error(`Im an error! ${event.Records[0].attributes.ApproximateReceiveCount}`)
     
   }
 
-  console.log('Message Count: ', messageCount)
-  console.log(JSON.stringify(event))
+  
 
 }
 
