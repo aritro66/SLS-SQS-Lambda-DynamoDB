@@ -3,48 +3,38 @@ const { SQS } = require("aws-sdk");
 const sqs = new SQS();
 const QUEUE_URL = `https://sqs.us-east-1.amazonaws.com/${process.env.ACCOUNT_ID}/demo`;
 
-var deadmessage=0;
+
 var messageCount = 0;
-module.exports.consumer =  (event) => {
+module.exports.consumer = async (event) => {
 
-  try {
-    const random = Math.random();
 
-    if (event.Records) {
-      messageCount += event.Records.length
-    }
+  const random = Math.random();
 
-    if (random > 0.5) {
-      const err = new Error('Im an error!')
-      throw err
-    }
+  if (event.Records) {
+    messageCount += event.Records.length
+  }
+  
+  if (retries > 3) {
+    throw new Error("more than 3 tries");
+  }
+  if (random > 0.5) {
+    const retries = event.Records[0].attributes.ApproximateReceiveCount;
+    const receipt = event.Records[0].receiptHandle;
+    const Visibilityparams = {
+      QueueUrl: QUEUE_URL,
+      ReceiptHandle: receipt,
+      VisibilityTimeout: parseInt(Backoff(retries))
+    };
+    console.log(Visibilityparams)
+    sqs.changeMessageVisibility(Visibilityparams)
 
-    console.log('Message Count: ', messageCount)
-    console.log(JSON.stringify(event))
-  } catch (err) {
-    console.log("error occured");
-    console.log(JSON.stringify(event));
-    event.Records.forEach(async(ele) => {
-      const retries = ele.attributes.ApproximateReceiveCount;
-      const receipt = ele.receiptHandle;
-      console.log(retries);
-      if (retries > 3) {
-        deadmessage+=1;
-        return;
-      }
-      console.log("w");
-      const Visibilityparams = {
-          QueueUrl: QUEUE_URL,
-          ReceiptHandle: receipt,
-          VisibilityTimeout: parseInt(Backoff(retries))
-        };
-        console.log(Visibilityparams)
-        const chkdata = await sqs.changeMessageVisibility(Visibilityparams).promise();
-        console.log(`checking data : ${chkdata}`);
-    });
-    console.log("dead-message",deadmessage);
 
-  };
+    throw new Error(`Im an error! ${retries}`)
+    
+  }
+
+  console.log('Message Count: ', messageCount)
+  console.log(JSON.stringify(event))
 
 }
 
