@@ -15,11 +15,11 @@ provider:
     - Effect: "Allow"
       Action:
         - "sqs:*"
-      Resource: "arn:aws:sqs:${self:provider.region}:*:demo"
+      Resource: "*"
     - Effect: "Allow"
       Action:
         - dynamodb:*
-      Resource: "arn:aws:dynamodb:us-east-1:581086713195:table/demo-dlqlist-dev"
+      Resource: "*"
 
 constructs:
   jobs:
@@ -60,9 +60,6 @@ resources:
     demo:
       Type: "AWS::SQS::Queue"
       Properties:
-        RedrivePolicy:
-          deadLetterTargetArn: arn:aws:sqs:us-east-1:581086713195:demodlq
-          maxReceiveCount: 4
         QueueName: "demo"
     
     demodlq:
