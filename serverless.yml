@@ -45,10 +45,7 @@ functions:
             Fn::GetAtt:
               - demo
               - Arn
-          batchSize: 10
-  saveDLQ:
-    handler: DlqList.savedata
-    
+          batchSize: 10    
     
 
 plugins:
@@ -62,10 +59,6 @@ resources:
       Properties:
         QueueName: "demo"
     
-    demodlq:
-      Type: "AWS::SQS::Queue"
-      Properties:
-        QueueName: "demodlq"
     
     dlqlist: 
       Type: AWS::DynamoDB::Table

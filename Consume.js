@@ -2,7 +2,6 @@ const AWS = require("aws-sdk");
 const uuid = require('uuid');
 const sqs = new AWS.SQS();
 const QUEUE_URL = `https://sqs.us-east-1.amazonaws.com/${process.env.ACCOUNT_ID}/demo`;
-// const QUEUE_URL2 = `https://sqs.us-east-1.amazonaws.com/${process.env.ACCOUNT_ID}/demodlq`;
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 var messageCount = 0;
@@ -25,11 +24,9 @@ module.exports.consumer = async (event) => {
 
   
   for (let i = 0; i < dlqlist.length; i++) {
-    const retries = dlqlist[i].attributes.ApproximateReceiveCount;
+  
     const receipt = dlqlist[i].receiptHandle;
-    console.log(retries);
-
-    console.log("wu");
+    
     const params = {
       TableName: process.env.DYNAMODB_DLQ_TABLE,
       Item: {
@@ -39,34 +36,37 @@ module.exports.consumer = async (event) => {
       }
     };
     console.log(params);
-    await dynamoDb.put(params).promise(); // save in database
+    // save in database
+    await dynamoDb.put(params).promise(); 
     const deleteparams = {
       QueueUrl: QUEUE_URL,
       ReceiptHandle: receipt,
     }
-    await sqs.deleteMessage(deleteparams).promise(); // deleting message from sqs
+    // deleting message from sqs
+    await sqs.deleteMessage(deleteparams).promise(); 
   }
-
-  if (random <= 0.5 || visibilitylist.length == 0) {  // no error criteria
+  
+  // no error criteria
+  if (random <= 0.5 || visibilitylist.length == 0) {  
     return;
   }
 
   for (let i = 0; i < visibilitylist.length; i++) {
     const retries = visibilitylist[i].attributes.ApproximateReceiveCount;
     const receipt = visibilitylist[i].receiptHandle;
-    console.log(retries);
-
-    console.log("w");
+    
     const Visibilityparams = {
       QueueUrl: QUEUE_URL,
       ReceiptHandle: receipt,
       VisibilityTimeout: parseInt(Backoff(retries))
     };
     console.log(Visibilityparams)
-    await sqs.changeMessageVisibility(Visibilityparams).promise();  // changing message visibility
+    // changing message visibility
+    const chk=await sqs.changeMessageVisibility(Visibilityparams).promise();  
+    console.log(JSON.stringify(chk));
   }
-
-  throw new Error(`Im an error!`) // emiting error
+  // emiting error
+  throw new Error(`Message Recieve Failed`) 
 
 }
 
