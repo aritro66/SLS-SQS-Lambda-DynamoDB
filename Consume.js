@@ -22,11 +22,11 @@ module.exports.consumer = async (event) => {
   console.log("dlq", JSON.stringify(dlqlist));
   console.log("visibility", JSON.stringify(visibilitylist));
 
-  
+
   for (let i = 0; i < dlqlist.length; i++) {
-  
+
     const receipt = dlqlist[i].receiptHandle;
-    
+
     const params = {
       TableName: process.env.DYNAMODB_DLQ_TABLE,
       Item: {
@@ -37,24 +37,24 @@ module.exports.consumer = async (event) => {
     };
     console.log(params);
     // save in database
-    await dynamoDb.put(params).promise(); 
+    await dynamoDb.put(params).promise();
     const deleteparams = {
       QueueUrl: QUEUE_URL,
       ReceiptHandle: receipt,
     }
     // deleting message from sqs
-    await sqs.deleteMessage(deleteparams).promise(); 
+    await sqs.deleteMessage(deleteparams).promise();
   }
-  
+
   // no error criteria
-  if (random <= 0.5 || visibilitylist.length == 0) {  
+  if (random <= 0.5 || visibilitylist.length == 0) {
     return;
   }
 
   for (let i = 0; i < visibilitylist.length; i++) {
     const retries = visibilitylist[i].attributes.ApproximateReceiveCount;
     const receipt = visibilitylist[i].receiptHandle;
-    
+
     const Visibilityparams = {
       QueueUrl: QUEUE_URL,
       ReceiptHandle: receipt,
@@ -62,18 +62,18 @@ module.exports.consumer = async (event) => {
     };
     console.log(Visibilityparams)
     // changing message visibility
-    const chk=await sqs.changeMessageVisibility(Visibilityparams).promise();  
+    const chk = await sqs.changeMessageVisibility(Visibilityparams).promise();
     console.log(JSON.stringify(chk));
   }
   // emiting error
-  throw new Error(`Message Recieve Failed`) 
+  throw new Error(`Message Recieve Failed`)
 
 }
 
 
 const Backoff = (retries) => {
   let jitter = Math.floor((Math.random() * 60) + 1);
-  let backoff = Math.pow(2, retries) + 30 + jitter;
+  let backoff = Math.pow(2, retries) * 30 + jitter;
 
   return backoff;
 }
