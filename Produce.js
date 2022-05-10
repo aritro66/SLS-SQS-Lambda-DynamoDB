@@ -31,7 +31,7 @@ module.exports.producer = async (event) => {
 
 const createBatchEntries = () => {
   let entries = []
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 20; i++) {
     entries.push({
       Id: parseInt(Math.random() * 100000).toString(),
       MessageBody: Math.random().toString()

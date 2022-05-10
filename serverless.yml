@@ -45,7 +45,7 @@ functions:
             Fn::GetAtt:
               - demo
               - Arn
-          batchSize: 10    
+          batchSize: 20    
     
 
 plugins:
