@@ -10,7 +10,7 @@ module.exports.producer = async (event) => {
 
 
   try {
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 10; i++) {
       await sqs.sendMessageBatch({ Entries: createBatchEntries(), QueueUrl: QUEUE_URL }).promise()
     }
 
