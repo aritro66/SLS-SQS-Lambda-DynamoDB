@@ -1,4 +1,5 @@
 const { SQS } = require("aws-sdk");
+const Backoff = require('./Backoff.js');
 
 const sqs = new SQS();
 const QUEUE_URL = `https://sqs.us-east-1.amazonaws.com/${process.env.ACCOUNT_ID}/demo`;
@@ -35,6 +36,7 @@ const createBatchEntries = () => {
     entries.push({
       Id: parseInt(Math.random() * 100000).toString(),
       MessageBody: Math.random().toString(),
+      DelaySeconds: Backoff(Math.floor(Math.random() * 3 + 1)),
       MessageAttributes: {
         reAtempts: {
           DataType: "String",
@@ -45,3 +47,4 @@ const createBatchEntries = () => {
   }
   return entries
 }
+

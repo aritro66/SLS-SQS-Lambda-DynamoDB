@@ -1,5 +1,6 @@
 const AWS = require("aws-sdk");
 const uuid = require('uuid');
+const Backoff = require('./Backoff.js');
 const sqs = new AWS.SQS();
 const QUEUE_URL = `https://sqs.us-east-1.amazonaws.com/${process.env.ACCOUNT_ID}/demo`;
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -92,11 +93,3 @@ module.exports.consumer = async (event) => {
 }
 
 
-const Backoff = (retries) => {
-  // let jitter = Math.floor((Math.random() * 60) + 1);
-  // let backoff = Math.min(30, Math.pow(2, retries) * 10) + jitter;
-  let temp = Math.min(60, Math.pow(2, retries) * 20);
-  let sleep = temp / 2 + Math.random() * (temp / 2);
-  let backoff = Math.floor(sleep);
-  return backoff;
-}
