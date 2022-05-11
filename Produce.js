@@ -34,7 +34,13 @@ const createBatchEntries = () => {
   for (let i = 0; i < 10; i++) {
     entries.push({
       Id: parseInt(Math.random() * 100000).toString(),
-      MessageBody: Math.random().toString()
+      MessageBody: Math.random().toString(),
+      MessageAttributes: {
+        reAtempts: {
+          DataType: "String",
+          StringValue: "1"
+        }
+      }
     })
   }
   return entries
