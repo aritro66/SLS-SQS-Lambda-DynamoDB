@@ -21,11 +21,7 @@ provider:
         - dynamodb:*
       Resource: "*"
 
-constructs:
-  jobs:
-    type: queue
-    worker:
-      handler: handler.consumer
+
 
 
 functions:
@@ -35,8 +31,6 @@ functions:
       - httpApi:
           method: get
           path: /produce
-    environment:
-      QUEUE_URL: ${construct:jobs.queueUrl}
   consume:
     handler: Consume.consumer
     events:

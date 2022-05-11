@@ -72,8 +72,10 @@ module.exports.consumer = async (event) => {
 
 
 const Backoff = (retries) => {
-  let jitter = Math.floor((Math.random() * 60) + 1);
-  let backoff = Math.pow(2, retries) * 30 + jitter;
-
+  // let jitter = Math.floor((Math.random() * 60) + 1);
+  // let backoff = Math.min(30, Math.pow(2, retries) * 10) + jitter;
+  let temp = Math.min(30, Math.pow(2, retries) * 5);
+  let sleep = temp / 2 + Math.random() * (temp / 2);
+  let backoff = Math.floor(30 + sleep);
   return backoff;
 }
