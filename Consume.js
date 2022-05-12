@@ -47,7 +47,7 @@ module.exports.consumer = async (event) => {
   }
 
   // no error criteria
-  if (random <= 0.5 || visibilitylist.length == 0) {
+  if (random <= 0.8 || visibilitylist.length == 0) {
     return;
   }
 
